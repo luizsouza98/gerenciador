@@ -1,0 +1,118 @@
+import os
+import sys
+import pymysql
+
+
+def UserChoose():
+    os.system("cls")
+    print("============================================")
+    print("============== LMV SOLUTIONS ================")
+    print("======= O seu gerenciador de chamados =======")
+    print("=============================================")
+    print("Olâ, escolha a opção desejada: ")
+    print("1 - NOVO CHAMADO")
+    print("2 - ALTERAR CHAMADO")
+    print("3 - CONSULTAR CHAMADO")
+    print("4 - SAIR")
+
+    opcaoDesejada = int(input("Por favor, digite aqui: "))
+
+    if opcaoDesejada == 1:
+        novoChamado()
+
+    elif opcaoDesejada == 2:
+        alterarChamado()
+
+    elif opcaoDesejada == 3:
+        consultarChamado()
+
+    elif opcaoDesejada == 4:
+        sys.exit()
+
+    else:
+        print("Escolha uma opção válida!")
+        UserChoose()
+
+def novoChamado():
+    print("ATENÇÂO, preencher corretamente os campos abaixo: ")
+
+    nome = input("Nome: ")
+    dpto = input("Departamento: ")
+    tel = input("Telefone: ")
+    email = input("E-mail: ")
+    desc = input("Descrição do Chamado: ")
+
+    conn = pymysql.connect(
+        host = 'localhost',
+        user = 'root',
+        passwd = '',
+        database = 'mdteste'
+)
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO lmvsolutions (nome,departamento,telefone,email,descricao) VALUES( '{0}','{1}','{2}','{3}','{4}' )"
+    .format(nome, dpto, tel, email, desc))
+    conn.commit()
+
+    sair = input("Chamado registrado com sucesso! Digite 4 para voltar ao menu inicial ou qualquer outra tecla para encerrar o promagra: ")
+
+    if sair == '4':
+        conn.close()
+        UserChoose()
+    else:
+        conn.close()
+        sys.exit()
+
+
+def alterarChamado():
+    conn = pymysql.connect(
+    host='localhost',
+    user='root',
+    passwd='',
+    db='mdteste'
+    )
+    cursor = conn.cursor()
+
+    id_chamado = int(input("Digite o ID do chamado: "))
+
+    novo_fone = input("Digite o novo telefone: ")
+    novo_email = input("Digite o novo E-mail: ")
+    nova_descricao = input("Descreva o problema: ")
+
+    cursor.execute("UPDATE lmvsolutions SET telefone = '{0}', email = '{1}', descricao = '{2}' WHERE id = '{3}' "
+    .format(novo_fone, novo_email, nova_descricao, id_chamado))
+    conn.commit()
+
+    sair = input("Alteração realizada com sucesso! Digite 4 para voltar ao menu inicial ou qualquer outra tecla para encerrar o promagra: ")
+    if sair == '4':
+        conn.close()
+        UserChoose()
+    else:
+        conn.close()
+        sys.exit()
+
+
+def consultarChamado():
+    conn = pymysql.connect(host='localhost', user='root', passwd='', db='mdteste')
+    cursor = conn.cursor()
+    busca = input("Digite o ID do chamadado desejado: ")
+
+    cursor.execute("""SELECT * FROM lmvsolutions WHERE id = '{}' """.format(busca))
+
+    for linha in cursor.fetchall():
+        print("ID: ", linha[0])
+        print("Nome: ", linha[1])
+        print("Departamento: ", linha[2])
+        print("Telefone: ", linha[3])
+        print("E-mail: ", linha[4])
+        print("Descrição: ", linha[5])
+    sair = input("Digite 4 para encerrar a consulta e voltar ao menu ou qualquer coisa para encerrar o programa: ")
+    if sair == '4':
+        conn.close()
+        UserChoose()
+    else:
+        conn.close()
+        sys.exit()
+
+
+if __name__ == "__main__":
+    UserChoose()
